@@ -1,0 +1,9 @@
+	server {
+        	listen          80;
+	        server_name     mirror.vinzv.de;
+	        root            /var/www/mirror;
+
+	        location / {
+			autoindex  on;
+	        }
+	}

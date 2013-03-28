@@ -1,0 +1,42 @@
+server {
+		listen 80;
+		server_name status.vinzv.de;
+#		rewrite ^ https://$server_name$request_uri? permanent;  # enforce https
+#}
+
+#server {
+		listen 443 ssl;
+#		server_name status.vinzv.de;
+		root /var/www/statusnet/;
+
+		ssl on;
+		ssl_certificate /etc/nginx/certs/status.vinzv.de.crt;
+		ssl_certificate_key /etc/nginx/certs/status.vinzv.de.key;	
+
+		access_log /var/log/nginx/status.vinzv.de_access.log;
+		error_log /var/log/nginx/status.vinzv.de_error.log;
+
+		location ~* (\.jpg|\.png|\.gif|\.jpeg)$ {
+		  valid_referers none blocked *.status.vinzv.de;
+		  if ($invalid_referer) {
+			return 403;
+		  }
+		  root   /var/www/statusnet;
+		}
+
+		location / {
+			root   /var/www/statusnet;
+			index  index.php;
+			if (!-e $request_filename) {
+					rewrite  ^(.*)$  /index.php?p=$1  last;
+					break;
+			}
+		}
+
+		location ~ \.php$ {
+			include fastcgi_params;
+			fastcgi_pass  127.0.0.1:9000;
+			fastcgi_index index.php;
+			fastcgi_param  SCRIPT_FILENAME  /var/www/statusnet$fastcgi_script_name;
+		}
+}

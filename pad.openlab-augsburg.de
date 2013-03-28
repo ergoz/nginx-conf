@@ -1,0 +1,23 @@
+server {
+		listen 80;
+		server_name pad.openlab-augsburg.de;
+		rewrite ^ https://$server_name$request_uri? permanent;  # enforce https
+}
+server {
+		listen		443 ssl;
+		server_name	pad.openlab-augsburg.de;
+
+		ssl_certificate		/etc/nginx/certs/etherpad.crt;
+		ssl_certificate_key	/etc/nginx/certs/etherpad.key;
+
+		access_log		/opt/etherpad/etherpad-lite-log/eplite.access.log;
+		error_log		/opt/etherpad/etherpad-lite-log/eplite.error.log;
+
+			location / {
+				proxy_pass		http://localhost:9001/;
+				proxy_set_header	Host $host;
+				proxy_buffering		off;
+			}
+
+}
+

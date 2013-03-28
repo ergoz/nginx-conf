@@ -1,0 +1,26 @@
+server {
+		listen 80;
+		server_name rss.vinzv.de;
+		rewrite ^ https://$server_name$request_uri? permanent;  # enforce https
+}
+
+server {
+		listen 443 ssl;
+		server_name rss.vinzv.de;
+		root /var/www/ttrss/;
+
+		ssl_certificate /etc/nginx/certs/cloud.vinzv.de.crt;
+		ssl_certificate_key /etc/nginx/certs/cloud.vinzv.de.key;
+
+		access_log /var/log/nginx/cloud.vinzv.de.access_log;
+		error_log /var/log/nginx/cloud.vinzv.de.error_log info;
+
+		location / {
+				index	index.php;
+		}
+ 
+		location ~ \.php$ {
+				fastcgi_pass 127.0.0.1:9000;
+				include /etc/nginx/fastcgi_params;
+		}
+}
